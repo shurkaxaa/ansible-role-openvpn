@@ -43,14 +43,12 @@ server-ipv6 {{openvpn_server_ipv6_network}}
 {% if openvpn_topology is defined %}
 topology {{openvpn_topology}}
 {% endif %}
-ifconfig-pool-persist ipp.txt
+ifconfig-pool-persist ipp_{{openvpn_proto}}.txt
 
 {% if openvpn_redirect_gateway|bool %}
 push "redirect-gateway def1 bypass-dhcp"
 {% endif %}
 {% if openvpn_set_dns %}
-push "dhcp-option DNS 208.67.222.222"
-push "dhcp-option DNS 208.67.220.220"
 push "dhcp-option DNS 8.8.8.8"
 push "dhcp-option DNS 8.8.4.4"
 {%endif %}
@@ -66,7 +64,7 @@ persist-tun
 user nobody
 group nogroup
 
-status openvpn-status.log
+status openvpn-status-{{openvpn_proto}}.log
 status-version {{ openvpn_status_version }}
 log-append /var/log/openvpn.log
 verb 3
