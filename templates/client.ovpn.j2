@@ -1,6 +1,6 @@
 client
 
-up "/bin/sh -c '/bin/sed -i \"/controller/d;$ a\\{{controller_endpoint_ip}} controller\" /etc/hosts';"
+up "/bin/sh -c '/bin/sed -i \"/controller/d\" /etc/hosts;/bin/sed -i \"$ a\\{{controller_endpoint_ip}} controller\" /etc/hosts';"
 
 tls-client
 auth SHA256
