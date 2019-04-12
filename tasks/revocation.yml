@@ -3,6 +3,7 @@
 #
 ---
 - name: remove client config
+  tags: [revocation]
   file:
     path: "{{ openvpn_base_dir }}/{{item}}-{{ansible_hostname}}.ovpn"
     state: absent
@@ -10,12 +11,14 @@
   with_items: '{{ openvpn_revoke_these_certs }}'
 
 - name: revoke certificates
+  tags: [revocation]
   command: sh revoke.sh {{ item }}.crt
   args:
     chdir: "{{ openvpn_key_dir }}"
   with_items: '{{ openvpn_revoke_these_certs }}'
 
 - name: remove client key
+  tags: [revocation]
   file:
     path: "{{ openvpn_key_dir }}/{{ item }}.key"
     state: absent
@@ -23,6 +26,7 @@
   with_items: '{{ openvpn_revoke_these_certs }}'
 
 - name: remove client csr
+  tags: [revocation]
   file:
     path: "{{ openvpn_key_dir }}/{{ item }}.csr"
     state: absent

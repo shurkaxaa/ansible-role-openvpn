@@ -1,6 +1,7 @@
 # generate client keys
 ---
 - name: Copy openssl client extensions
+  tags: [client_keys]
   copy:
     src: openssl-client.ext
     dest: "{{openvpn_key_dir}}"
@@ -9,6 +10,7 @@
     mode: 0400
 
 - name: generate client key
+  tags: [client_keys]
   command: "openssl req -nodes -newkey rsa:{{openvpn_rsa_bits}} -keyout {{item}}.key -out {{item}}.csr -days 3650 -subj /CN=OpenVPN-Client-{{ inventory_hostname[:24] }}-{{ item[:24] }}/"
   args:
     chdir: "{{ openvpn_key_dir }}"
@@ -16,12 +18,14 @@
   with_items: "{{clients}}"
 
 - name: protect client keys
+  tags: [client_keys]
   file:
     path: "{{openvpn_key_dir}}/{{item}}.key"
     mode: 0400
   with_items: "{{clients}}"
 
 - name: sign client key
+  tags: [client_keys]
   command: openssl x509 -req -in {{item}}.csr -out {{item}}.crt -CA ca.crt -CAkey ca-key.pem -sha256 -days 3650 -extfile openssl-client.ext
   args:
     chdir: "{{openvpn_key_dir}}"
@@ -29,28 +33,33 @@
   with_items: "{{clients}}"
 
 - name: register server ca key
+  tags: [client_keys]
   slurp:
     src: "{{openvpn_key_dir}}/ca.crt"
   register: ca_cert
 
 - name: register tls-auth key
+  tags: [client_keys]
   slurp:
     src: "{{openvpn_key_dir}}/ta.key"
   register: tls_auth
 
 - name: register client certs
+  tags: [client_keys]
   slurp:
     src: "{{openvpn_key_dir}}/{{item}}.crt"
   with_items: "{{clients}}"
   register: client_certs
 
 - name: register client keys
+  tags: [client_keys]
   slurp:
     src: "{{openvpn_key_dir}}/{{item}}.key"
   with_items: "{{clients}}"
   register: client_keys
 
 - name: generate client config
+  tags: [client_keys]
   template:
     src: client.ovpn.j2
     dest: "{{ openvpn_base_dir }}/{{item.0.item}}-{{openvpn_proto}}-{{inventory_hostname}}.ovpn"
@@ -62,6 +71,7 @@
     - "{{client_keys.results}}"
 
 - name: fetch client config
+  tags: [client_keys]
   fetch:
     src: "{{ openvpn_base_dir }}/{{item}}-{{openvpn_proto}}-{{inventory_hostname}}.ovpn"
     dest: "{{ openvpn_fetch_config_dir }}/{{item}}/{{openvpn_proto}}/{{inventory_hostname}}.ovpn"

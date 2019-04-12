@@ -1,4 +1,5 @@
 - name: Check for firewalld
+  tags: [firewall]
   command: which firewall-cmd
   register: firewalld
   check_mode: no
@@ -6,6 +7,7 @@
   ignore_errors: yes
 
 - name: Check for ufw
+  tags: [firewall]
   command: which ufw
   register: ufw
   check_mode: no
@@ -13,6 +15,7 @@
   ignore_errors: yes
 
 - name: Check for iptables
+  tags: [firewall]
   command: which iptables
   register: iptables
   check_mode: no
@@ -20,23 +23,28 @@
   ignore_errors: yes
 
 - name: Fail on both firewalld & ufw
+  tags: [firewall]
   fail:
     msg: "Both FirewallD and UFW are detected, firewall situation is unknown"
   when: firewalld.rc == 0 and ufw.rc == 0
 
 - name: Fail on no firewall detected
+  tags: [firewall]
   fail:
     msg: "No firewall detected, install one before proceeding (firewalld||ufw||iptables)"
   when: firewalld.rc != 0 and ufw.rc != 0 and iptables.rc != 0
 
 - name: Add port rules (iptables)
+  tags: [firewall]
   include: iptables.yml
   when: firewalld.rc != 0 and ufw.rc != 0 and iptables.rc == 0
 
 - name: Add port rules (firewalld)
+  tags: [firewall]
   include: firewalld.yml
   when: firewalld.rc == 0 and ufw.rc != 0
 
 - name: Add port rules (ufw)
+  tags: [firewall]
   include: ufw.yml
   when: firewalld.rc != 0 and ufw.rc == 0

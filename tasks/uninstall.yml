@@ -1,30 +1,36 @@
 - name: Disable openvpn auto-start & start
+  tags: [uninstall]
   service:
     name: "{{openvpn_service_name}}"
     enabled: no
     state: stopped
 
 - name: Wipe out config directory
+  tags: [uninstall]
   file:
     path: "{{ openvpn_base_dir }}"
     state: absent
 
 - name: Remove openvpn logrotate config file
+  tags: [uninstall]
   file:
     path: /etc/logrotate.d/openvpn.conf
     state: absent
 
 - name: Uninstall OpenVPN
+  tags: [uninstall]
   package:
     name: openvpn
     state: absent
 
 - name: Uninstall LDAP plugin
+  tags: [uninstall]
   package:
    name: openvpn-auth-ldap
    state: absent
   when: openvpn_use_ldap
 
 - name: Terminate playbook
+  tags: [uninstall]
   fail:
     msg: "OpenVPN uninstalled, playbook stopped"
