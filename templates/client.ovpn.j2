@@ -1,6 +1,6 @@
 client
 
-up "/bin/sh -c '/bin/sed -i \"/controller/d\" /etc/hosts;/bin/sed -i \"$ a\\{{controller_endpoint_ip}} controller\" /etc/hosts';"
+up "/bin/sh -c 'if test -x /opt/2youio/edge/bin/vpnconnect; then /bin/sh -x /opt/2youio/edge/bin/vpnconnect {{controller_endpoint_ip}}; fi'"
 
 tls-client
 auth SHA256
